@@ -14,8 +14,7 @@ var minorsTableHead = document.getElementById("minorUsersTableHead");
 var minorsTableBody = document.getElementById("minorUsersTableBody");
 var searchUsersButton = document.getElementById("searchUsersButton");
 var searchUsersInput = document.getElementById("searchUsersInput");
-var searchUsersTableHead = document.getElementById("searchUsersTableHead");
-var searchUsersTableBody = document.getElementById("searchUsersTableBody");
+var searchResponseBox = document.getElementById("searchResponseBox");
 var getAndDisplayUsers = function (userAttributesToFetch) {
     fetch("https://dummyjson.com/users?select=".concat(userAttributesToFetch))
         .then(function (res) { return res.json(); })
@@ -23,25 +22,37 @@ var getAndDisplayUsers = function (userAttributesToFetch) {
         .then(function (users) {
         if (users.length) {
             displayUsers(users);
-            var _loop_1 = function (key) {
-                var buttonElementID = key + "SortButton";
-                var sortButton = document.getElementById(buttonElementID);
-                sortButton.addEventListener("click", function () {
-                    var sorted = __spreadArray([], users, true).sort(function (a, b) {
-                        return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1;
-                    });
-                    tableBody.innerHTML = '';
-                    sorted.forEach(function (user) {
-                        addUserTableHTML(user, tableBody);
-                    });
-                });
-            };
-            for (var key in users[0]) {
-                _loop_1(key);
-            }
+            addSortButtons(users);
             displayMinorUsers(users);
         }
     });
+};
+var addSortButtons = function (users) {
+    var _loop_1 = function (key) {
+        var buttonElementID = key + "SortButton";
+        var sortButton = document.getElementById(buttonElementID);
+        sortButton.addEventListener("click", function () {
+            var sorted = __spreadArray([], users, true).sort(function (a, b) {
+                switch (typeof a[key]) {
+                    case "number":
+                        return a[key] - b[key];
+                    case "string":
+                        return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1;
+                    default:
+                        return 0;
+                }
+            });
+            tableBody.innerHTML = '';
+            sorted.forEach(function (user) {
+                addUserTableHTML(user, tableBody);
+            });
+        });
+    };
+    for (var key in users[0]) {
+        _loop_1(key);
+    }
+};
+var listenToSortButtons = function (users) {
 };
 var displayUsers = function (users) {
     tableHead.innerHTML = '';
@@ -112,33 +123,27 @@ var addUserTableHTML = function (user, tableBodyElement) {
     });
 };
 var searchUsers = function (searchKey, searchString, userAttributesToSearch) {
-    searchUsersTableHead.innerHTML = '';
-    searchUsersTableBody.innerHTML = '';
+    searchResponseBox.innerHTML = '';
     fetch("https://dummyjson.com/users/filter?key=".concat(searchKey, "&value=").concat(searchString, "&select=").concat(userAttributesToSearch))
         .then(function (res) { return res.json(); })
         .then(function (data) {
         var users = __spreadArray([], data.users, true);
         if (users.length) {
-            var div = document.createElement("div");
-            div.innerHTML = "Ho trovato ".concat(users.length, " utenti che hanno cognome \u2018").concat(searchString, "\u2019:");
-            searchUsersTableBody.appendChild(div);
+            searchResponseBox.innerHTML = "Ho trovato ".concat(users.length, " utenti che hanno il cognome \u2018").concat(searchString, "\u2019:");
             users.forEach(function (user, index) {
                 var div = document.createElement("div");
                 var birthDate = new Date(user.birthDate).toLocaleString().split(',')[0];
-                console.log(birthDate);
                 div.innerHTML = "".concat(index + 1, ": ").concat(user.firstName, " ").concat(user.lastName, " ").concat(user.gender == 'female' ? 'nata' : 'nato', " il ").concat(birthDate, " a ").concat(user.address.city);
-                searchUsersTableBody.appendChild(div);
+                searchResponseBox.append(div);
             });
         }
         else {
-            searchUsersTableBody.innerHTML = "Non sono stati trovati utenti col cognome \u2018".concat(searchString, "\u2019.");
+            searchResponseBox.innerHTML = "Non sono stati trovati utenti col cognome \u2018".concat(searchString, "\u2019.");
         }
     });
+    searchResponseBox.style.display = "block";
 };
-var userAttributesToFetch = "id,firstName,lastName,birthDate,age";
-getAndDisplayUsers(userAttributesToFetch);
-searchUsersButton.addEventListener("click", function () {
-    console.log('Search button clicked!', searchUsersInput.value);
+var listenToSearchUsersButton = function () {
     var searchKey = "lastName";
     var searchString = searchUsersInput.value.trim();
     if (searchString.length) {
@@ -147,7 +152,13 @@ searchUsersButton.addEventListener("click", function () {
         searchUsers(searchKey, searchString, userAttributesToSearch);
     }
     else {
-        searchUsersTableBody.innerHTML = "Inserisci il cognome per cercare.";
+        searchResponseBox.innerHTML = "Inserisci il cognome per cercare.";
     }
-});
+};
+var main = function () {
+    var userAttributesToFetch = "id,firstName,lastName,birthDate,age";
+    getAndDisplayUsers(userAttributesToFetch);
+    searchUsersButton.addEventListener("click", listenToSearchUsersButton);
+};
+main();
 //# sourceMappingURL=index.js.map

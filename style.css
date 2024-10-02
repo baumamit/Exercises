@@ -49,15 +49,17 @@ caption {
     border: none;
 }
 
-#searchUsersTable {
-    border: none;
-}
-#searchUsersTableBody {
+#searchResponseBox {
+    display: none;
     font-size: 1.5rem;
     border: none;
-    border-radius: 5rem;
+    border-radius: 1rem;
     background-color: rgb(254, 183, 89);
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    max-width: 32rem;
 }
+
 
 /* #allUsers,
 #minorUsers {

@@ -8,17 +8,16 @@ let minorsTableBody: HTMLElement | null = document.getElementById("minorUsersTab
 
 let searchUsersButton: HTMLElement | null = document.getElementById("searchUsersButton");
 let searchUsersInput = document.getElementById("searchUsersInput") as HTMLInputElement;
-let searchUsersTableHead: HTMLElement | null = document.getElementById("searchUsersTableHead");
-let searchUsersTableBody: HTMLElement | null = document.getElementById("searchUsersTableBody");
+let searchResponseBox: HTMLElement | null = document.getElementById("searchResponseBox");
 
 // Define a user type
 interface UserType {
-    [key: string]: any; // Needed to call the content by attribute key, user[key]
-    id?: number;
-    firstName?: string;
-    lastName?: string;
-    birthDate?: string;
-    age?: number;
+    [key: string]: any; // Needed for refering to the content of an object by an attribute key, user[key]
+    id: number;
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+    age: number;
 }
 
 
@@ -34,27 +33,41 @@ const getAndDisplayUsers = (userAttributesToFetch: string) => {
             if (users.length) {
                 // Display the fetched users
                 displayUsers(users);
-
-                // Listen to buttons
-                for (const key in users[0]) {
-                    const buttonElementID = key + "SortButton";
-                    const sortButton: HTMLElement = document.getElementById(buttonElementID);
-
-                    sortButton.addEventListener("click", () => {
-                        // console.log(`\n${key} sort button is clicked!\n`);
-                        const sorted = [...users].sort((a: UserType, b: UserType) => {
-                            return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1
-                        });
-                        tableBody.innerHTML = '';
-                        sorted.forEach((user) => {
-                            addUserTableHTML(user, tableBody);
-                        });
-                    });
-                }
+                // Add sort buttons to a users table headers
+                addSortButtons(users)
                 // ● Indicare la presenza di eventuali studenti minorenni
                 displayMinorUsers(users);
             }
         });
+}
+
+const addSortButtons = (users: UserType[]) => {
+    for (const key in users[0]) {
+        const buttonElementID = key + "SortButton";
+        const sortButton: HTMLElement = document.getElementById(buttonElementID);
+
+        sortButton.addEventListener("click", () => {
+            // console.log(`\n${key} sort button is clicked!\n`);
+            const sorted = [...users].sort((a: UserType, b: UserType) => {
+                switch (typeof a[key]) {
+                    case "number":
+                        return a[key]-b[key]                            
+                    case "string":
+                        return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1                            
+                    default:
+                        return 0;
+                }
+            });
+            tableBody.innerHTML = '';
+            sorted.forEach((user) => {
+                addUserTableHTML(user, tableBody);
+            });
+        });
+    }
+}
+
+const listenToSortButtons = (users: UserType) => {
+
 }
 
 const displayUsers = (users: UserType[]) => {
@@ -149,48 +162,43 @@ const addUserTableHTML = (user: UserType, tableBodyElement: HTMLElement) => {
 
 // Function to search users by a search key and print only specific attributes of matching users
 const searchUsers = (searchKey: string, searchString: string, userAttributesToSearch: string) => {
-    searchUsersTableHead.innerHTML = '';
-    searchUsersTableBody.innerHTML = '';
+    // Clear previous search results
+    searchResponseBox.innerHTML = '';
     fetch(`https://dummyjson.com/users/filter?key=${searchKey}&value=${searchString}&select=${userAttributesToSearch}`)
         .then(res => res.json())
         .then((data) => {
             // console.log(users);
             const users: UserType[] = [...data.users];
             if (users.length) {
-                const div = document.createElement("div");
-                div.innerHTML = `Ho trovato ${users.length} utenti che hanno cognome ‘${searchString}’:`
-                searchUsersTableBody.appendChild(div);
+                // Create a response box
+                searchResponseBox.innerHTML = `Ho trovato ${users.length} utenti che hanno il cognome ‘${searchString}’:`
+
+                // Fill in the response content
                 users.forEach((user: UserType, index: number) => {
                     const div = document.createElement("div");
                     const birthDate = new Date(user.birthDate).toLocaleString().split(',')[0];
-                    //console.log(birthDate);
-
                     // 1: Mario Rossi nato il 23/09/2000 a Palermo
                     // 2: Giulio Rossi nato il 11/09/2023 a Torino
                     div.innerHTML = `${index + 1}: ${user.firstName} ${user.lastName} ${user.gender == 'female' ? 'nata' : 'nato'} il ${birthDate} a ${user.address.city}`;
-                    searchUsersTableBody.appendChild(div);
+                    searchResponseBox.append(div);
                 });
             } else {
-                searchUsersTableBody.innerHTML = `Non sono stati trovati utenti col cognome ‘${searchString}’.`;
+                searchResponseBox.innerHTML = `Non sono stati trovati utenti col cognome ‘${searchString}’.`;
             }
 
         });
+    searchResponseBox.style.display = "block"
 }
 
-// ******** MAIN LOOP ********
-// Specify attributes to fetch from the database
-const userAttributesToFetch = `id,firstName,lastName,birthDate,age`;
-getAndDisplayUsers(userAttributesToFetch);
-
-/* Esercizio 6 - Parte 1:
-Ricerca per cognome
+// Function to search on click users with the last name that match the input search box
+const listenToSearchUsersButton = () => {
+/* Esercizio 6 - Parte 1: Ricerca per cognome
 Realizzare una function che, dato il cognome, restituisce i dettagli di tutti gli utenti con quel
 cognome, contattando le api di dummyjson.
 https://dummyjson.com/docs/users#users-search */
-
-searchUsersButton.addEventListener("click", () => {
+    //console.log(searchKey);
+    const searchKey = "lastName";
     //console.log('Search button clicked!', searchUsersInput.value);
-    const searchKey = `lastName`;
     // Remove spaces from the input string;
     let searchString: string = searchUsersInput.value.trim();
     if (searchString.length) {
@@ -200,6 +208,18 @@ searchUsersButton.addEventListener("click", () => {
         const userAttributesToSearch = `id,firstName,lastName,birthDate,address,gender`;
         searchUsers(searchKey, searchString, userAttributesToSearch);
     } else {
-        searchUsersTableBody.innerHTML = `Inserisci il cognome per cercare.`;
+        searchResponseBox.innerHTML = `Inserisci il cognome per cercare.`;
     }
-});
+}
+
+// ******** MAIN LOOP ********
+const main = () => {
+    // Specify attributes to fetch from the database
+    const userAttributesToFetch = `id,firstName,lastName,birthDate,age`;
+    getAndDisplayUsers(userAttributesToFetch);
+
+    // Esercizio 6 - Parte 1: Ricerca per cognome
+    searchUsersButton.addEventListener("click", listenToSearchUsersButton);
+}
+
+main();
