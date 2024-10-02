@@ -1,0 +1,67 @@
+html {
+    font-size: 18px;
+}
+
+h2 {
+    margin-top: 3rem;
+}
+
+table {
+    border: 2px solid grey;
+}
+
+th {
+    background-color: antiquewhite;
+    font-size: 1.2rem;
+    padding: 0.2rem;
+}
+.sort-button {
+    background-color: rgb(255, 216, 216);
+    padding: 0 0.3rem;
+}
+
+td {
+    border-bottom: 2px solid grey;
+    background-color: bisque;
+    padding: 5px;
+}
+
+caption {
+    text-align: start;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    min-width: 20rem;
+}
+
+#searchUsersBox {
+    border: 2px solid grey;
+    border-radius: 5rem;
+    padding: 0.8rem 0.6rem 0.5rem 0.6rem;
+    background-color: rgb(112, 234, 255);
+}
+#searchUsersInput, #searchUsersButton, .fa-sort {
+    border: none;
+    background-color: rgba(0, 0, 0, 0);
+    font-size: 1.5rem;
+}
+#searchUsersInput:focus {
+    border: none;
+}
+
+#searchUsersTable {
+    border: none;
+}
+#searchUsersTableBody {
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 5rem;
+    background-color: rgb(254, 183, 89);
+}
+
+/* #allUsers,
+#minorUsers {
+    display: grid;
+    grid-template-columns: 1tr 1tr;
+} */
+

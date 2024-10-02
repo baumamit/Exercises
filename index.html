@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENGIM - Registro Utenti</title>
+    <script type="module" defer src="./index.js"></script>
+    <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAATlBMVEUAAAD////+/v79/f3Ozs7x8fFzc3MyMjLDw8OFhYVaWlpERETq6upfX1+ioqL4+Pjd3d1+fn5JSUllZWXj4+MMDAyOjo4tLS2bm5uoqKgsJqvbAAACB0lEQVRIiX2V65brIAiF2dq0yeTaaWfaef8XPQoSIbGHXy74FkE2EkIMySIigh6yB+0DRQvpAcladKATnW3tupUPB5pxQ6d4P4zENg59hKczburGdiVn1w0wdML33AHTTCebJ1Q6XVVzByxnONvCPBORNDfw1aaJvoBCc3Y53j7RRLeoFyCt+z904lEuQKVuV8myxfh8H+qxMtlbXnOpWSLb1AVGpskE7qolcDfuCbtMMP1+wczJq/rnXSZsJkuPKgp6E9igMtki3QwGdyWVybXMzaBtr8y7/+S3m0F8H8rM2Qfj+3ETix8TGuQ1YTS+1DBDP21kBMsE60s56ny77xKxTFidLzdM6c1H1pwdnXfSU+YbTutsXcJxwulPXvXf0d8hN3I9uokev7+Ps3eVRp4DbQMPgW/kZxvPMr3e/cVY/zYzqTLVIehxMhdkmfYRm7BviHrY21le0/7KLi064iLRq7ym5BD1Hm06lLe2Mc6uWWpr0uVu+fHJWipyd2jSZUrSqoy69HhxPNu0jPHCtC49XkuZ/0CXtVSWHmTpXdCgc2NuunqovB1ZqUPeX/aWYMlvsdC8xeQVy5rk4VVPGWKtpMikmWRR3vtO5O96WXpLpQOZKuvPZpxnHdN5MrQ0Usv98CurdP03FcFPP8pgac7uG+d+w8HToPZUlfYc6UiflD8eZNP+AyZXEFDZXnjtAAAAAElFTkSuQmCC" type="image/x-icon">
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <h1>Registro utenti</h1>
+
+    <div>
+      <h2>CERCA UTENTI PER COGNOME</h2>
+
+      <label id="searchUsersBox" for="searchUsersInput">
+        <input type="search" id="searchUsersInput" placeholder="Cerca per cognome">
+        <i id="searchUsersButton" class="fa fa-search" aria-hidden="true" alt="invia ricerca"></i>
+      </label>
+
+      <table id="searchUsersTable">
+        <thead id="searchUsersTableHead"></thead>
+        <tbody id="searchUsersTableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="allUsers">
+      <h2>UTENTI DELLA PIATTAFORMA</h2>
+
+      <table id="allUsersTable">
+        <thead id="allUsersTableHead"></thead>
+        <tbody id="allUsersTableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="minorUsers">
+      <h2>UTENTI MINORI</h2>
+
+      <table id="minorUsersTable">
+        <thead id="minorUsersTableHead"></thead>
+        <tbody id="minorUsersTableBody"></tbody>
+      </table>
+    </div>
+
+</body>
+</html>

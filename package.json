@@ -1,0 +1,14 @@
+{
+  "name": "registro_utenti",
+  "version": "1.0.0",
+  "description": "Registro di utenti dal API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Amit Baum",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}

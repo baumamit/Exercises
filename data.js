@@ -1,0 +1,1 @@
+export const data = '{\"firstName\":\"Mario\",\"lastName\":\"Rossi\",\"birthDate\":\"2000-08-01T00:00:00.000Z\",\"address\":\"Via Roma 22,Roma\",\"id\":2343254\}';
