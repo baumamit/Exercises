@@ -22,7 +22,6 @@ var getAndDisplayUsers = function (userAttributesToFetch) {
         .then(function (users) {
         if (users.length) {
             displayUsers(users);
-            addSortButtons(users);
             displayMinorUsers(users);
         }
     });
@@ -32,27 +31,28 @@ var addSortButtons = function (users) {
         var buttonElementID = key + "SortButton";
         var sortButton = document.getElementById(buttonElementID);
         sortButton.addEventListener("click", function () {
-            var sorted = __spreadArray([], users, true).sort(function (a, b) {
-                switch (typeof a[key]) {
-                    case "number":
-                        return a[key] - b[key];
-                    case "string":
-                        return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1;
-                    default:
-                        return 0;
-                }
-            });
-            tableBody.innerHTML = '';
-            sorted.forEach(function (user) {
-                addUserTableHTML(user, tableBody);
-            });
+            sortUsersByKey(users, key);
         });
     };
     for (var key in users[0]) {
         _loop_1(key);
     }
 };
-var listenToSortButtons = function (users) {
+var sortUsersByKey = function (users, key) {
+    var usersSortedByKey = __spreadArray([], users, true).sort(function (a, b) {
+        switch (typeof a[key]) {
+            case "number":
+                return a[key] - b[key];
+            case "string":
+                return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1;
+            default:
+                return 0;
+        }
+    });
+    tableBody.innerHTML = '';
+    usersSortedByKey.forEach(function (user) {
+        addUserTableHTML(user, tableBody);
+    });
 };
 var displayUsers = function (users) {
     tableHead.innerHTML = '';
@@ -61,6 +61,7 @@ var displayUsers = function (users) {
     users.forEach(function (user) {
         addUserTableHTML(user, tableBody);
     });
+    addSortButtons(users);
 };
 var displayMinorUsers = function (users) {
     var minorUsers = users.filter(function (user) {
@@ -78,6 +79,7 @@ var displayMinorUsers = function (users) {
         minorUsersTableCaption.innerHTML = "Non sono presenti studenti minorenni.";
     }
     minorUsersTable.append(minorUsersTableCaption);
+    addSortButtons(minorUsers);
 };
 var translateKeyToHeader = function (key) {
     switch (key) {
@@ -141,7 +143,7 @@ var searchUsers = function (searchKey, searchString, userAttributesToSearch) {
             searchResponseBox.innerHTML = "Non sono stati trovati utenti col cognome \u2018".concat(searchString, "\u2019.");
         }
     });
-    searchResponseBox.style.display = "block";
+    searchResponseBox.style.display = "none";
 };
 var listenToSearchUsersButton = function () {
     var searchKey = "lastName";
