@@ -20,7 +20,6 @@ interface UserType {
     age: number;
 }
 
-
 // Function to get users array by attributes specified in the input parameter userAttributesToFetch
 // Return an empty array if no users are found to avoid the void error
 const getAndDisplayUsers = (userAttributesToFetch: string) => {
@@ -39,49 +38,72 @@ const getAndDisplayUsers = (userAttributesToFetch: string) => {
     });
 }
 
-// Function to add to each column of the users table a sort button
-const addSortButtons = (users: UserType[]) => {
+// Function to add a sort button to each column of the users table
+const addSortButtons = (users: UserType[], tableName: string) => {
     for (const key in users[0]) {
         // Generate a unique ID by the key attribute
-        const buttonElementID = key + "SortButton";
+        const buttonElementID = tableName + key + "SortButton";
+        // Get a specific button element with the unique id
         const sortButton: HTMLElement = document.getElementById(buttonElementID);
         
+        // Set a toggle attribute to reverse the sorting direction on each click
+        let ascendingOrder = true;
+        
         sortButton.addEventListener("click", () => {
-            sortUsersByKey(users,key)
+            sortUsersByKey(users, key, tableName, ascendingOrder)
+            // Toggle ascending/descending order
+            ascendingOrder = !ascendingOrder;
         });
     }
 }
 
-const sortUsersByKey = (users: UserType[], key: string) => {
+// Function to sort a users array by a givven key with the choise for ascending or descending order
+const sortUsersByKey = (users: UserType[], key: string, tableName: string, ascendingOrder: boolean) => {
     // console.log(`\n${key} sort button is clicked!\n`);
     const usersSortedByKey = [...users].sort((a: UserType, b: UserType) => {
         switch (typeof a[key]) {
-            case "number":
-            return a[key]-b[key]                            
-            case "string":
-            return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1                            
-            default:
-            return 0;
+            // Sort numbers by ascending or descending order
+            case "number": return ascendingOrder ? a[key]-b[key] : b[key]-a[key];
+            // Sort strings by ascending or descending order alphabetic order: A --> Z
+            case "string": return ascendingOrder ? a[key].toUpperCase().localeCompare(b[key].toUpperCase()) : b[key].toUpperCase().localeCompare(a[key].toUpperCase());
+            // Sort boolean values where `true` values first or last
+            case "boolean": {
+                const trueFirst = ascendingOrder ? a[key] : !a[key];
+                return trueFirst ? -1 : 1;
+            }
+            default: return 0;
         }
     });
-    tableBody.innerHTML = '';
+    
+    // Choose the correct table body elelment by table name
+    const tableBodyElement = ( tableName === "users" ? tableBody : minorsTableBody );
+    // Clear the body of the users table
+    tableBodyElement.innerHTML = '';
     usersSortedByKey.forEach((user) => {
-        addUserTableHTML(user, tableBody);
+        addUserTableHTML(user, tableName);
     });
 }
 
+// ● Nome, cognome e data di nascita di tutti gli utenti
 const displayUsers = (users: UserType[]) => {
-    // ● Nome, cognome e data di nascita di tutti gli utenti
-    tableHead.innerHTML = '';
-    addTableHeadHTML(users[0], tableHead);
+    const tableName = "users"
+    // Choose the correct table head elelment by table name
+    const tableHeadElement = ( tableName === "users" ? tableHead : minorsTableHead );
+    // Clear the head of the users table
+    tableHeadElement.innerHTML = '';
     
-    tableBody.innerHTML = '';
+    addTableHeadHTML(users[0], tableName);
+    
+    // Choose the correct table body elelment by table name
+    const tableBodyElement = ( tableName === "users" ? tableBody : minorsTableBody );
+    // Clear the body of the users table
+    tableBodyElement.innerHTML = '';
     users.forEach((user) => {
-        addUserTableHTML(user, tableBody);
+        addUserTableHTML(user, tableName);
     });
     
     // Add sort buttons to a users table headers
-    addSortButtons(users)
+    addSortButtons(users, tableName)
 }
 
 // Function to list the minor users
@@ -92,15 +114,17 @@ const displayMinorUsers = (users: UserType[]) => {
         return user.age < 30;
     });
     
+    const tableName = "minorUsers"
+    
     // Create an HTML element for displaying a notice as the caption of the minor users table
     const minorUsersTableCaption: HTMLElement = document.createElement("caption");
     // If there are minors in the users database..
     if (minorUsers.length) {
         // Report minors count in the caption of the minor users table
         minorUsersTableCaption.innerHTML = `Sono presenti ${minorUsers.length} studenti minorenni:`;
-        addTableHeadHTML(users[0], minorsTableHead);
+        addTableHeadHTML(minorUsers[0], tableName);
         minorUsers.forEach((minorUser) => {
-            addUserTableHTML(minorUser, minorsTableBody);
+            addUserTableHTML(minorUser, tableName);
         });
     } else {
         // Report that minors were found in the caption of the minor users table
@@ -109,7 +133,7 @@ const displayMinorUsers = (users: UserType[]) => {
     minorUsersTable.append(minorUsersTableCaption);
     
     // Add sort buttons to a users table headers
-    addSortButtons(minorUsers);
+    addSortButtons(minorUsers, tableName);
     
 };
 
@@ -132,7 +156,7 @@ const translateKeyToHeader = (key: string): string => {
 }
 
 // Function to add head titles to the table HTML code
-const addTableHeadHTML = (user: UserType, tableHeadElement: HTMLElement) => {
+const addTableHeadHTML = (user: UserType, tableName: string) => {
     Object.keys(user).forEach((key) => {
         // Create HTML elements for the headers
         const thElement: HTMLElement = document.createElement("th");
@@ -143,24 +167,32 @@ const addTableHeadHTML = (user: UserType, tableHeadElement: HTMLElement) => {
         
         // Create a search button indide each header
         const sortButton: HTMLElement = document.createElement("button");
-        const buttonID = `${key}SortButton`;
+        // Create a unique id for each newly created sort button
+        const buttonID = `${tableName}${key}SortButton`;
+        // Set the unique button id
         sortButton.setAttribute("id", buttonID);
+        // Add a general CSS class for all the sort buttons
         sortButton.setAttribute("class", "sort-button");
+        // Insert the sort button to the head element of the users table
         thElement.appendChild(sortButton);
         
         // Add a graphic icon to the button
         const iElement: HTMLElement = document.createElement("i");
         iElement.setAttribute("class", "fa fa-sort");
+        // Set alternative text for disabled accessibility 
         iElement.setAttribute("alt", "ordina per nome");
         sortButton.appendChild(iElement);
-        
+        // Choose the correct table head element id
+        const tableHeadElementID = ( tableName==="users" ? tableHead : minorsTableHead );
         // Add the final HTML code of each table header
-        tableHeadElement.appendChild(thElement);
+        tableHeadElementID.appendChild(thElement);
     });
 };
 
 // Function to add a single user entry to the table HTML code
-const addUserTableHTML = (user: UserType, tableBodyElement: HTMLElement) => {
+const addUserTableHTML = (user: UserType, tableName: string) => {
+    // Choose the correct table body elelment by table name
+    const tableBodyElement = ( tableName==="users" ? tableBody : minorsTableBody );
     // Create a row HTML code
     const trUser: HTMLElement = document.createElement("tr");
     tableBodyElement.appendChild(trUser);

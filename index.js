@@ -26,60 +26,68 @@ var getAndDisplayUsers = function (userAttributesToFetch) {
         }
     });
 };
-var addSortButtons = function (users) {
+var addSortButtons = function (users, tableName) {
     var _loop_1 = function (key) {
-        var buttonElementID = key + "SortButton";
+        var buttonElementID = tableName + key + "SortButton";
         var sortButton = document.getElementById(buttonElementID);
+        var ascendingOrder = true;
         sortButton.addEventListener("click", function () {
-            sortUsersByKey(users, key);
+            sortUsersByKey(users, key, tableName, ascendingOrder);
+            ascendingOrder = !ascendingOrder;
         });
     };
     for (var key in users[0]) {
         _loop_1(key);
     }
 };
-var sortUsersByKey = function (users, key) {
+var sortUsersByKey = function (users, key, tableName, ascendingOrder) {
     var usersSortedByKey = __spreadArray([], users, true).sort(function (a, b) {
         switch (typeof a[key]) {
-            case "number":
-                return a[key] - b[key];
-            case "string":
-                return (a[key]).toUpperCase() > (b[key]).toUpperCase() ? 1 : -1;
-            default:
-                return 0;
+            case "number": return ascendingOrder ? a[key] - b[key] : b[key] - a[key];
+            case "string": return ascendingOrder ? a[key].toUpperCase().localeCompare(b[key].toUpperCase()) : b[key].toUpperCase().localeCompare(a[key].toUpperCase());
+            case "boolean": {
+                var trueFirst = ascendingOrder ? a[key] : !a[key];
+                return trueFirst ? -1 : 1;
+            }
+            default: return 0;
         }
     });
-    tableBody.innerHTML = '';
+    var tableBodyElement = (tableName === "users" ? tableBody : minorsTableBody);
+    tableBodyElement.innerHTML = '';
     usersSortedByKey.forEach(function (user) {
-        addUserTableHTML(user, tableBody);
+        addUserTableHTML(user, tableName);
     });
 };
 var displayUsers = function (users) {
-    tableHead.innerHTML = '';
-    addTableHeadHTML(users[0], tableHead);
-    tableBody.innerHTML = '';
+    var tableName = "users";
+    var tableHeadElement = (tableName === "users" ? tableHead : minorsTableHead);
+    tableHeadElement.innerHTML = '';
+    addTableHeadHTML(users[0], tableName);
+    var tableBodyElement = (tableName === "users" ? tableBody : minorsTableBody);
+    tableBodyElement.innerHTML = '';
     users.forEach(function (user) {
-        addUserTableHTML(user, tableBody);
+        addUserTableHTML(user, tableName);
     });
-    addSortButtons(users);
+    addSortButtons(users, tableName);
 };
 var displayMinorUsers = function (users) {
     var minorUsers = users.filter(function (user) {
         return user.age < 30;
     });
+    var tableName = "minorUsers";
     var minorUsersTableCaption = document.createElement("caption");
     if (minorUsers.length) {
         minorUsersTableCaption.innerHTML = "Sono presenti ".concat(minorUsers.length, " studenti minorenni:");
-        addTableHeadHTML(users[0], minorsTableHead);
+        addTableHeadHTML(minorUsers[0], tableName);
         minorUsers.forEach(function (minorUser) {
-            addUserTableHTML(minorUser, minorsTableBody);
+            addUserTableHTML(minorUser, tableName);
         });
     }
     else {
         minorUsersTableCaption.innerHTML = "Non sono presenti studenti minorenni.";
     }
     minorUsersTable.append(minorUsersTableCaption);
-    addSortButtons(minorUsers);
+    addSortButtons(minorUsers, tableName);
 };
 var translateKeyToHeader = function (key) {
     switch (key) {
@@ -97,14 +105,14 @@ var translateKeyToHeader = function (key) {
             return "";
     }
 };
-var addTableHeadHTML = function (user, tableHeadElement) {
+var addTableHeadHTML = function (user, tableName) {
     Object.keys(user).forEach(function (key) {
         var thElement = document.createElement("th");
         var keyElement = document.createElement("b");
         keyElement.innerHTML = translateKeyToHeader(key);
         thElement.appendChild(keyElement);
         var sortButton = document.createElement("button");
-        var buttonID = "".concat(key, "SortButton");
+        var buttonID = "".concat(tableName).concat(key, "SortButton");
         sortButton.setAttribute("id", buttonID);
         sortButton.setAttribute("class", "sort-button");
         thElement.appendChild(sortButton);
@@ -112,10 +120,12 @@ var addTableHeadHTML = function (user, tableHeadElement) {
         iElement.setAttribute("class", "fa fa-sort");
         iElement.setAttribute("alt", "ordina per nome");
         sortButton.appendChild(iElement);
-        tableHeadElement.appendChild(thElement);
+        var tableHeadElementID = (tableName === "users" ? tableHead : minorsTableHead);
+        tableHeadElementID.appendChild(thElement);
     });
 };
-var addUserTableHTML = function (user, tableBodyElement) {
+var addUserTableHTML = function (user, tableName) {
+    var tableBodyElement = (tableName === "users" ? tableBody : minorsTableBody);
     var trUser = document.createElement("tr");
     tableBodyElement.appendChild(trUser);
     Object.keys(user).forEach(function (key) {

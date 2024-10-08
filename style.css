@@ -16,8 +16,12 @@ th {
     padding: 0.2rem;
 }
 .sort-button {
-    background-color: rgb(255, 216, 216);
+    background-color: rgb(255, 211, 135);
     padding: 0 0.3rem;
+}
+.sort-button:hover {
+    background-color: rgb(255, 169, 30);
+    cursor: pointer;
 }
 
 td {
